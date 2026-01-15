@@ -239,6 +239,11 @@
       transparent 50%
     );
   }
+
+  /* Arc card specific styles */
+  .arc-card {
+    transition: transform 0.1s ease-out, opacity 0.2s ease-out;
+  }
 }
 
 @layer utilities {
