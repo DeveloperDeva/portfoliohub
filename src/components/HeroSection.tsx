@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
-import Carousel from "./Carousel";
+import ArcCarousel from "./ArcCarousel";
 
 const HeroSection = () => {
   return (
@@ -113,7 +113,7 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="w-full"
         >
-          <Carousel />
+          <ArcCarousel />
         </motion.div>
 
         {/* Bottom gradient fade */}
