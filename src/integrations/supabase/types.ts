@@ -14,7 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      blog_posts: {
+        Row: {
+          author_avatar: string | null
+          author_name: string
+          category: Database["public"]["Enums"]["blog_category"]
+          content: string
+          created_at: string
+          excerpt: string
+          featured_image: string | null
+          id: string
+          is_featured: boolean
+          is_published: boolean
+          published_at: string | null
+          read_time_minutes: number
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_avatar?: string | null
+          author_name?: string
+          category?: Database["public"]["Enums"]["blog_category"]
+          content: string
+          created_at?: string
+          excerpt: string
+          featured_image?: string | null
+          id?: string
+          is_featured?: boolean
+          is_published?: boolean
+          published_at?: string | null
+          read_time_minutes?: number
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_avatar?: string | null
+          author_name?: string
+          category?: Database["public"]["Enums"]["blog_category"]
+          content?: string
+          created_at?: string
+          excerpt?: string
+          featured_image?: string | null
+          id?: string
+          is_featured?: boolean
+          is_published?: boolean
+          published_at?: string | null
+          read_time_minutes?: number
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +76,12 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      blog_category:
+        | "portfolio-tips"
+        | "photographer-websites"
+        | "business-websites"
+        | "personal-branding"
+        | "ui-ux-insights"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +208,14 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      blog_category: [
+        "portfolio-tips",
+        "photographer-websites",
+        "business-websites",
+        "personal-branding",
+        "ui-ux-insights",
+      ],
+    },
   },
 } as const
