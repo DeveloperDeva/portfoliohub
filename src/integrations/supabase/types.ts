@@ -29,6 +29,7 @@ export type Database = {
           published_at: string | null
           read_time_minutes: number
           slug: string
+          tags: string[] | null
           title: string
           updated_at: string
         }
@@ -46,6 +47,7 @@ export type Database = {
           published_at?: string | null
           read_time_minutes?: number
           slug: string
+          tags?: string[] | null
           title: string
           updated_at?: string
         }
@@ -63,8 +65,72 @@ export type Database = {
           published_at?: string | null
           read_time_minutes?: number
           slug?: string
+          tags?: string[] | null
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      portfolio_items: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          media_type: string
+          media_url: string
+          status: string
+          tech_stack: string[] | null
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          media_type: string
+          media_url: string
+          status?: string
+          tech_stack?: string[] | null
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          media_type?: string
+          media_url?: string
+          status?: string
+          tech_stack?: string[] | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
         }
         Relationships: []
       }
@@ -73,9 +139,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
+      app_role: "admin" | "user"
       blog_category:
         | "portfolio-tips"
         | "photographer-websites"
@@ -209,6 +282,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "user"],
       blog_category: [
         "portfolio-tips",
         "photographer-websites",
