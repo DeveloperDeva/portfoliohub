@@ -4,7 +4,7 @@ import ArcCarousel from "./ArcCarousel";
 
 const HeroSection = () => {
   return (
-    <section className="relative min-h-screen overflow-hidden bg-background">
+    <section id="work" className="relative min-h-screen overflow-hidden bg-background">
       {/* Ambient background glows */}
       <div className="ambient-glow ambient-glow-1 animate-pulse-glow" />
       <div className="ambient-glow ambient-glow-2 animate-pulse-glow" style={{ animationDelay: "1.5s" }} />
@@ -74,8 +74,8 @@ const HeroSection = () => {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="text-lg md:text-xl text-muted-foreground text-center max-w-2xl mb-10 px-4"
         >
-          I craft immersive digital experiences that captivate users and 
-          elevate brands. From concept to launch, your vision brought to life.
+          Premium portfolio websites for photographers, businesses, and professionals.
+          Immersive experiences that captivate and convert.
         </motion.p>
 
         {/* CTA Buttons */}
@@ -85,13 +85,13 @@ const HeroSection = () => {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="flex flex-col sm:flex-row gap-4 mb-16"
         >
-          <button className="btn-hero group flex items-center gap-2">
+          <a href="#pricing" className="btn-hero group flex items-center gap-2">
             View My Work
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </button>
-          <button className="btn-outline-glow">
-            Let's Talk
-          </button>
+          </a>
+          <a href="#contact" className="btn-outline-glow">
+            Get Your Website
+          </a>
         </motion.div>
 
         {/* Section label */}
