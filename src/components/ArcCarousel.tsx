@@ -1,11 +1,13 @@
 import { useEffect, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ImageOff } from "lucide-react";
 import ArcCard, { type PortfolioItem } from "./ArcCard";
 import FullScreenViewer from "./FullScreenViewer";
 import { useArcCarousel } from "@/hooks/useArcCarousel";
 import { usePreviewNavigation } from "@/hooks/usePreviewNavigation";
+import { usePortfolioItems } from "@/hooks/usePortfolioItems";
 
+// Fallback demo items for when database is empty
 import photographerImg from "@/assets/portfolio-photographer.jpg";
 import startupImg from "@/assets/portfolio-startup.jpg";
 import weddingImg from "@/assets/portfolio-wedding.jpg";
@@ -13,7 +15,7 @@ import personalImg from "@/assets/portfolio-personal.jpg";
 import gymImg from "@/assets/portfolio-gym.jpg";
 import agencyImg from "@/assets/portfolio-agency.jpg";
 
-const portfolioItems: PortfolioItem[] = [
+const fallbackItems: PortfolioItem[] = [
   {
     id: "photographer",
     media: photographerImg,
@@ -59,7 +61,11 @@ const portfolioItems: PortfolioItem[] = [
 ];
 
 const ArcCarousel = () => {
-  const itemCount = portfolioItems.length;
+  const { data: portfolioItems, isLoading, error } = usePortfolioItems();
+  
+  // Use database items if available, otherwise fallback to demo items
+  const items = portfolioItems && portfolioItems.length > 0 ? portfolioItems : fallbackItems;
+  const itemCount = items.length;
   
   // Responsive item width
   const getItemWidth = () => {
@@ -127,7 +133,35 @@ const ArcCarousel = () => {
     scrollToIndex(Math.min(itemCount - 1, centerIndex + 1));
   }, [scrollToIndex, itemCount]);
 
-  const selectedItem = selectedIndex !== null ? portfolioItems[selectedIndex] : null;
+  const selectedItem = selectedIndex !== null ? items[selectedIndex] : null;
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="relative w-full h-[350px] md:h-[420px] lg:h-[500px] flex items-center justify-center">
+        <div className="flex gap-4">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="w-[180px] h-[250px] md:w-[220px] md:h-[300px] rounded-xl bg-muted animate-pulse"
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="relative w-full h-[350px] md:h-[420px] lg:h-[500px] flex items-center justify-center">
+        <div className="text-center glass-card p-8 rounded-xl">
+          <ImageOff className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+          <p className="text-muted-foreground">Failed to load portfolio items</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative w-full">
@@ -175,7 +209,7 @@ const ArcCarousel = () => {
           className="absolute inset-0"
           style={{ transformStyle: "preserve-3d" }}
         >
-          {portfolioItems.map((item, index) => {
+          {items.map((item, index) => {
             const cardStyle = getCardTransform(index);
             return (
               <ArcCard
