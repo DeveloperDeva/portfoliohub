@@ -53,17 +53,12 @@ const ArcCard = memo(({
     return () => observer.disconnect();
   }, []);
 
-  // Play video preview on hover
+  // Auto-play video when loaded
   useEffect(() => {
-    if (item.type === "video" && videoRef.current) {
-      if (isHovered) {
-        videoRef.current.play().catch(() => {});
-      } else {
-        videoRef.current.pause();
-        videoRef.current.currentTime = 0;
-      }
+    if (item.type === "video" && videoRef.current && shouldLoad) {
+      videoRef.current.play().catch(() => {});
     }
-  }, [isHovered, item.type]);
+  }, [item.type, shouldLoad]);
 
   return (
     <motion.div
@@ -114,7 +109,7 @@ const ArcCard = memo(({
               />
             ) : (
               <>
-                {/* Video with poster fallback */}
+                {/* Video with auto-play */}
                 <video
                   ref={videoRef}
                   src={item.media}
@@ -122,16 +117,17 @@ const ArcCard = memo(({
                   muted
                   loop
                   playsInline
+                  autoPlay
                   className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ${
                     isLoaded ? "opacity-100" : "opacity-0"
                   } ${isHovered ? "scale-110" : "scale-100"}`}
                   onLoadedData={() => setIsLoaded(true)}
                 />
-                {/* Play indicator */}
+                {/* Play indicator - shows video is playing */}
                 <motion.div
                   className="absolute top-4 right-4 p-2 rounded-full bg-background/60 backdrop-blur-sm"
                   initial={{ opacity: 0.7 }}
-                  animate={{ opacity: isHovered ? 0 : 0.7 }}
+                  animate={{ opacity: isHovered ? 0 : 0.5 }}
                 >
                   <Play className="w-4 h-4 text-primary fill-primary" />
                 </motion.div>
