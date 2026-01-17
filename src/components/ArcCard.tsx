@@ -9,6 +9,7 @@ export interface PortfolioItem {
   title: string;
   category: string;
   poster?: string;
+  description?: string;
 }
 
 interface ArcCardProps {
