@@ -84,6 +84,7 @@ export type Database = {
           thumbnail_url: string | null
           title: string
           updated_at: string
+          website_url: string | null
         }
         Insert: {
           category: string
@@ -97,6 +98,7 @@ export type Database = {
           thumbnail_url?: string | null
           title: string
           updated_at?: string
+          website_url?: string | null
         }
         Update: {
           category?: string
@@ -110,6 +112,7 @@ export type Database = {
           thumbnail_url?: string | null
           title?: string
           updated_at?: string
+          website_url?: string | null
         }
         Relationships: []
       }
