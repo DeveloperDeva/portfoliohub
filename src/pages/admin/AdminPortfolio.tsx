@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Plus, 
-  Pencil, 
-  Trash2, 
-  Eye, 
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  Eye,
   X,
   Upload,
   Loader2,
@@ -48,6 +48,7 @@ interface PortfolioItem {
   description: string | null;
   tech_stack: string[] | null;
   status: string;
+  website_url: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -76,6 +77,7 @@ const AdminPortfolio = () => {
     media_url: '',
     description: '',
     tech_stack: '',
+    website_url: '',
     status: 'draft',
   });
 
@@ -121,6 +123,7 @@ const AdminPortfolio = () => {
           media_url: item.media_url,
           description: item.description || '',
           tech_stack: item.tech_stack?.join(', ') || '',
+          website_url: item.website_url || '',
           status: item.status,
         });
         setIsFormOpen(true);
@@ -198,6 +201,7 @@ const AdminPortfolio = () => {
       media_url: '',
       description: '',
       tech_stack: '',
+      website_url: '',
       status: 'draft',
     });
   };
@@ -249,6 +253,7 @@ const AdminPortfolio = () => {
       media_url: formData.media_url,
       description: formData.description || null,
       tech_stack: formData.tech_stack ? formData.tech_stack.split(',').map((s) => s.trim()) : null,
+      website_url: formData.website_url || null,
       status: formData.status,
     };
 
@@ -306,11 +311,10 @@ const AdminPortfolio = () => {
                 )}
                 {/* Status badge */}
                 <div
-                  className={`absolute top-2 right-2 text-xs px-2 py-1 rounded-full ${
-                    item.status === 'published'
-                      ? 'bg-green-500/90 text-white'
-                      : 'bg-yellow-500/90 text-black'
-                  }`}
+                  className={`absolute top-2 right-2 text-xs px-2 py-1 rounded-full ${item.status === 'published'
+                    ? 'bg-green-500/90 text-white'
+                    : 'bg-yellow-500/90 text-black'
+                    }`}
                 >
                   {item.status}
                 </div>
@@ -336,6 +340,7 @@ const AdminPortfolio = () => {
                         media_url: item.media_url,
                         description: item.description || '',
                         tech_stack: item.tech_stack?.join(', ') || '',
+                        website_url: item.website_url || '',
                         status: item.status,
                       });
                       setIsFormOpen(true);
@@ -536,6 +541,16 @@ const AdminPortfolio = () => {
                     value={formData.tech_stack}
                     onChange={(e) => setFormData((prev) => ({ ...prev, tech_stack: e.target.value }))}
                     placeholder="React, TypeScript, Tailwind"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="website_url">Website URL (for View Live Site button)</Label>
+                  <Input
+                    id="website_url"
+                    value={formData.website_url}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, website_url: e.target.value }))}
+                    placeholder="https://example.com"
                   />
                 </div>
 

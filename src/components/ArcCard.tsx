@@ -10,6 +10,7 @@ export interface PortfolioItem {
   category: string;
   poster?: string;
   description?: string;
+  website_url?: string;
 }
 
 interface ArcCardProps {
@@ -30,6 +31,7 @@ const ArcCard = memo(({
   const [isLoaded, setIsLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const mouseDownRef = useRef<number | null>(null);
 
   // Lazy load media when in viewport
   const [shouldLoad, setShouldLoad] = useState(false);
@@ -56,12 +58,13 @@ const ArcCard = memo(({
   // Auto-play video when loaded
   useEffect(() => {
     if (item.type === "video" && videoRef.current && shouldLoad) {
-      videoRef.current.play().catch(() => {});
+      videoRef.current.play().catch(() => { });
     }
   }, [item.type, shouldLoad]);
 
   return (
     <motion.div
+      layoutId={`card-${item.id}`}
       ref={cardRef}
       className="arc-card absolute cursor-pointer"
       style={{
@@ -74,26 +77,33 @@ const ArcCard = memo(({
         height: "280px",
         transformStyle: "preserve-3d",
         willChange: "transform, opacity",
+        pointerEvents: "auto",
       }}
-      onClick={onClick}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
+      onMouseDown={(e) => {
+        mouseDownRef.current = e.clientX;
+      }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onTouchStart={(e) => {
+        mouseDownRef.current = e.touches[0].clientX;
+      }}
+      onTouchEnd={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
       whileHover={{ scale: 1.05 }}
       role="button"
       tabIndex={0}
       aria-label={`View ${item.title} - ${item.category}`}
       onKeyDown={(e) => e.key === "Enter" && onClick()}
     >
-      {/* Card glow effect on hover */}
-      <motion.div 
-        className="absolute -inset-1 rounded-xl bg-gradient-to-r from-primary/20 via-secondary/20 to-primary/20 blur-xl"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: isHovered ? 1 : 0 }}
-        transition={{ duration: 0.3 }}
-      />
-      
-      {/* Main card */}
-      <div className="relative w-full h-full rounded-xl overflow-hidden bg-card border border-border/50 hover:border-primary/50 transition-colors">
+      {/* Main card - Glass Effect */}
+      <div className="relative w-full h-full rounded-xl overflow-hidden bg-white/5 border border-white/10 backdrop-blur-sm shadow-2xl transition-all duration-500">
+
         {/* Media container */}
         {shouldLoad && (
           <>
@@ -101,64 +111,55 @@ const ArcCard = memo(({
               <img
                 src={item.media}
                 alt={item.title}
-                className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ${
-                  isLoaded ? "opacity-100 scale-100" : "opacity-0 scale-105"
-                } ${isHovered ? "scale-110" : "scale-100"}`}
+                className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ${isLoaded ? "opacity-100 scale-100" : "opacity-0 scale-110"
+                  } ${isHovered ? "scale-105" : "scale-100"}`}
                 onLoad={() => setIsLoaded(true)}
                 loading="lazy"
               />
             ) : (
+              // ... Video logic remains similar ...
               <>
-                {/* Video with auto-play */}
                 <video
                   ref={videoRef}
                   src={item.media}
-                  poster={item.poster || undefined}
                   muted
                   loop
                   playsInline
                   autoPlay
-                  className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ${
-                    isLoaded ? "opacity-100" : "opacity-0"
-                  } ${isHovered ? "scale-110" : "scale-100"}`}
+                  className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ${isLoaded ? "opacity-100" : "opacity-0"
+                    } ${isHovered ? "scale-105" : "scale-100"}`}
                   onLoadedData={() => setIsLoaded(true)}
                 />
-                {/* Play indicator - shows video is playing */}
-                <motion.div
-                  className="absolute top-4 right-4 p-2 rounded-full bg-background/60 backdrop-blur-sm"
-                  initial={{ opacity: 0.7 }}
-                  animate={{ opacity: isHovered ? 0 : 0.5 }}
-                >
-                  <Play className="w-4 h-4 text-primary fill-primary" />
-                </motion.div>
               </>
             )}
           </>
         )}
-        
+
         {/* Loading skeleton */}
         {!isLoaded && (
-          <div className="absolute inset-0 bg-muted animate-pulse" />
+          <div className="absolute inset-0 bg-white/5 animate-pulse" />
         )}
-        
-        {/* Overlay gradient */}
-        <div className={`absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent transition-opacity duration-300 ${
-          isHovered ? "opacity-60" : "opacity-80"
-        }`} />
-        
-        {/* Reflection effect */}
-        <div className="absolute inset-0 pointer-events-none bg-gradient-to-br from-white/10 via-transparent to-transparent" />
-        
+
+        {/* Cinematic Vignette Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80 pointer-events-none" />
+
+        {/* Shine/Reflection effect */}
+        <div
+          className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
+          style={{ mixBlendMode: "overlay" }}
+        />
+
         {/* Content */}
-        <motion.div 
-          className="absolute bottom-0 left-0 right-0 p-4"
-          initial={{ y: 8, opacity: 0.8 }}
-          animate={{ y: isHovered ? 0 : 8, opacity: isHovered ? 1 : 0.8 }}
+        <motion.div
+          className="absolute bottom-0 left-0 right-0 p-5 z-20 pointer-events-none"
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
         >
-          <p className="text-xs text-primary font-medium uppercase tracking-wider mb-1">
+          <p className="text-[10px] text-indigo-300 font-medium uppercase tracking-widest mb-2">
             {item.category}
           </p>
-          <h3 className="text-sm md:text-base font-display font-semibold text-foreground">
+          <h3 className="text-lg font-bold text-white leading-tight">
             {item.title}
           </h3>
         </motion.div>

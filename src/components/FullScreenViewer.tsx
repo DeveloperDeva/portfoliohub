@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronLeft, ChevronRight, Play, Pause, Volume2, VolumeX, Maximize } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Play, Pause, Volume2, VolumeX, Maximize, ExternalLink } from "lucide-react";
 import type { PortfolioItem } from "./ArcCard";
 
 interface FullScreenViewerProps {
@@ -38,6 +38,17 @@ const FullScreenViewer = ({
       videoRef.current.currentTime = 0;
     }
   }, [item?.id]);
+
+  // Auto-play video when modal opens and item is a video
+  useEffect(() => {
+    if (isOpen && item?.type === "video" && videoRef.current) {
+      videoRef.current.play().then(() => {
+        setIsPlaying(true);
+      }).catch(() => {
+        // Autoplay might be blocked, user can click to play
+      });
+    }
+  }, [isOpen, item?.type, item?.id]);
 
   // Auto-hide controls
   const resetControlsTimeout = useCallback(() => {
@@ -118,7 +129,7 @@ const FullScreenViewer = ({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center"
+          className="fixed inset-0 z-[9999] flex items-center justify-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -129,7 +140,7 @@ const FullScreenViewer = ({
         >
           {/* Backdrop */}
           <motion.div
-            className="absolute inset-0 bg-background/95 backdrop-blur-xl"
+            className="absolute inset-0 bg-[#030303] backdrop-blur-xl"
             onClick={onClose}
           />
 
@@ -185,17 +196,18 @@ const FullScreenViewer = ({
 
           {/* Content container */}
           <motion.div
+            layoutId={`card-${item.id}`}
             className="relative z-10 w-full max-w-6xl mx-4 md:mx-8"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           >
-            {/* Ambient glow */}
-            <div className="absolute -inset-8 rounded-3xl bg-gradient-to-r from-primary/20 via-secondary/20 to-primary/20 blur-3xl opacity-60" />
+            {/* Ambient glow - Ultra Premium */}
+            <div className="absolute -inset-10 rounded-3xl bg-indigo-500/20 blur-[100px] opacity-40 animate-pulse-glow" />
 
             {/* Browser frame */}
-            <div className="relative browser-frame shadow-2xl overflow-hidden">
+            <div className="relative browser-frame shadow-2xl overflow-hidden border border-white/10 bg-[#0A0A0A]">
               {/* Browser header */}
               <div className="browser-header border-b border-border/50">
                 <div className="flex gap-2">
@@ -208,6 +220,18 @@ const FullScreenViewer = ({
                     {item.title.toLowerCase().replace(/\s+/g, "-")}.com
                   </div>
                 </div>
+                {/* View Live Site Button */}
+                {item.website_url && (
+                  <a
+                    href={item.website_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1 rounded-full bg-indigo-500/20 hover:bg-indigo-500/40 border border-indigo-500/50 text-xs text-indigo-300 font-semibold flex items-center gap-1 transition-all hover:scale-105"
+                  >
+                    <span>Live</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                )}
               </div>
 
               {/* Media content */}
@@ -232,10 +256,11 @@ const FullScreenViewer = ({
                       muted={isMuted}
                       loop
                       playsInline
+                      autoPlay
                       onTimeUpdate={handleTimeUpdate}
                       onClick={togglePlay}
                     />
-                    
+
                     {/* Video controls overlay */}
                     <motion.div
                       className="absolute inset-0 flex items-center justify-center"
@@ -315,7 +340,7 @@ const FullScreenViewer = ({
 
               {/* Footer info */}
               <motion.div
-                className="p-6 border-t border-border/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+                className="p-4 border-t border-transparent flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 -mt-40"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
@@ -328,9 +353,24 @@ const FullScreenViewer = ({
                     {item.title}
                   </h2>
                 </div>
-                <button className="btn-outline-glow text-sm px-6 py-2 whitespace-nowrap">
-                  View Live Site
-                </button>
+                {item.website_url ? (
+                  <a
+                    href={item.website_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-outline-glow text-sm px-6 py-2 whitespace-nowrap inline-flex items-center gap-2 hover:scale-105 transition-transform"
+                  >
+                    View Live Site
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                ) : (
+                  <button
+                    className="btn-outline-glow text-sm px-6 py-2 whitespace-nowrap opacity-50 cursor-not-allowed"
+                    disabled
+                  >
+                    View Live Site
+                  </button>
+                )}
               </motion.div>
             </div>
           </motion.div>
@@ -344,11 +384,10 @@ const FullScreenViewer = ({
             {Array.from({ length: totalItems }).map((_, i) => (
               <button
                 key={i}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  i === currentIndex
-                    ? "bg-primary w-6"
-                    : "bg-muted-foreground/50 hover:bg-muted-foreground"
-                }`}
+                className={`w-2 h-2 rounded-full transition-all ${i === currentIndex
+                  ? "bg-primary w-6"
+                  : "bg-muted-foreground/50 hover:bg-muted-foreground"
+                  }`}
                 aria-label={`Go to item ${i + 1}`}
               />
             ))}

@@ -19,7 +19,7 @@ const Footer = () => {
               </span>
             </Link>
             <p className="text-muted-foreground max-w-md mb-6">
-              I create premium portfolio websites for photographers, businesses, and professionals 
+              I create premium portfolio websites for photographers, businesses, and professionals
               who want to stand out with immersive digital experiences.
             </p>
             <div className="flex items-center gap-4">
@@ -70,8 +70,8 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="#pricing" className="text-muted-foreground hover:text-primary transition-colors">
-                  Pricing
+                <a href="#portfolio" className="text-muted-foreground hover:text-primary transition-colors">
+                  Portfolio
                 </a>
               </li>
               <li>

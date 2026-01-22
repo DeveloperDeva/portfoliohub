@@ -6,7 +6,7 @@ import { Link, useLocation } from "react-router-dom";
 const navItems = [
   { label: "Work", href: "#work" },
   { label: "About", href: "#about" },
-  { label: "Pricing", href: "#pricing" },
+  { label: "Portfolio", href: "#portfolio" },
   { label: "Blog", href: "/blog" },
   { label: "Contact", href: "#contact" },
 ];
@@ -41,9 +41,8 @@ const Header = () => {
       <motion.header
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled ? "glass-card py-3" : "py-5"
-        }`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "glass-card py-3" : "py-5"
+          }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">

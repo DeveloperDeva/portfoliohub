@@ -8,52 +8,48 @@ import { usePreviewNavigation } from "@/hooks/usePreviewNavigation";
 import { usePortfolioItems } from "@/hooks/usePortfolioItems";
 
 // Fallback demo items for when database is empty
-import photographerImg from "@/assets/portfolio-photographer.jpg";
-import startupImg from "@/assets/portfolio-startup.jpg";
-import weddingImg from "@/assets/portfolio-wedding.jpg";
-import personalImg from "@/assets/portfolio-personal.jpg";
-import gymImg from "@/assets/portfolio-gym.jpg";
-import agencyImg from "@/assets/portfolio-agency.jpg";
+// Images are now in public/images/portfolio/
+
 
 const fallbackItems: PortfolioItem[] = [
   {
     id: "photographer",
-    media: photographerImg,
+    media: "/images/portfolio/portfolio-photographer.jpg",
     type: "image",
     title: "Sophia Laurent",
     category: "Photography Portfolio",
   },
   {
     id: "startup",
-    media: startupImg,
+    media: "/images/portfolio/portfolio-startup.jpg",
     type: "image",
     title: "Nexus AI",
     category: "Startup Landing",
   },
   {
     id: "wedding",
-    media: weddingImg,
+    media: "/images/portfolio/portfolio-wedding.jpg",
     type: "image",
     title: "Eternal Moments",
     category: "Wedding Studio",
   },
   {
     id: "personal",
-    media: personalImg,
+    media: "/images/portfolio/portfolio-personal.jpg",
     type: "image",
     title: "Marcus Chen",
     category: "Personal Brand",
   },
   {
     id: "gym",
-    media: gymImg,
+    media: "/images/portfolio/portfolio-gym.jpg",
     type: "image",
     title: "Iron Peak Fitness",
     category: "Gym Website",
   },
   {
     id: "agency",
-    media: agencyImg,
+    media: "/images/portfolio/portfolio-agency.jpg",
     type: "image",
     title: "Stellar Creative",
     category: "Digital Agency",
@@ -62,11 +58,11 @@ const fallbackItems: PortfolioItem[] = [
 
 const ArcCarousel = () => {
   const { data: portfolioItems, isLoading, error } = usePortfolioItems();
-  
+
   // Use database items if available, otherwise fallback to demo items
   const items = portfolioItems && portfolioItems.length > 0 ? portfolioItems : fallbackItems;
   const itemCount = items.length;
-  
+
   // Responsive item width
   const getItemWidth = () => {
     if (typeof window === "undefined") return 280;
@@ -117,10 +113,11 @@ const ArcCarousel = () => {
 
   // Handle card click
   const handleCardClick = useCallback((index: number) => {
-    if (isDragging) return;
+    // Allow clicks regardless of isDragging state
+    // This ensures portfolio items are always clickable to open preview
     scrollToIndex(index);
     openPreview(index);
-  }, [isDragging, scrollToIndex, openPreview]);
+  }, [scrollToIndex, openPreview]);
 
   // Nav button handlers
   const handlePrev = useCallback(() => {
@@ -205,7 +202,7 @@ const ArcCarousel = () => {
         aria-roledescription="carousel"
       >
         {/* Cards stage */}
-        <div 
+        <div
           className="absolute inset-0"
           style={{ transformStyle: "preserve-3d" }}
         >

@@ -1,128 +1,91 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
-import ArcCarousel from "./ArcCarousel";
+import ArcCarouselNew from "./ArcCarouselNew";
 
 const HeroSection = () => {
-  return (
-    <section id="work" className="relative min-h-screen overflow-hidden bg-background">
-      {/* Ambient background glows */}
-      <div className="ambient-glow ambient-glow-1 animate-pulse-glow" />
-      <div className="ambient-glow ambient-glow-2 animate-pulse-glow" style={{ animationDelay: "1.5s" }} />
-      
-      {/* Grid pattern overlay */}
-      <div 
-        className="absolute inset-0 opacity-[0.02]"
-        style={{
-          backgroundImage: `linear-gradient(hsl(var(--foreground)) 1px, transparent 1px),
-                           linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,
-          backgroundSize: "60px 60px"
-        }}
-      />
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
 
-      {/* Floating glass panels for depth */}
-      <motion.div
-        className="absolute top-20 left-[10%] w-32 h-32 glass-card rounded-2xl opacity-30"
-        animate={{ y: [0, -20, 0], rotate: [0, 5, 0] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute top-40 right-[15%] w-24 h-24 glass-card rounded-xl opacity-20"
-        animate={{ y: [0, 15, 0], rotate: [0, -3, 0] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-      />
-      <motion.div
-        className="absolute bottom-40 left-[20%] w-20 h-20 glass-card rounded-lg opacity-25"
-        animate={{ y: [0, -10, 0] }}
-        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-      />
+  return (
+    <section id="work" className="relative min-h-[100dvh] overflow-hidden bg-[#030303] text-white selection:bg-primary/30">
+
+      {/* Cinematic Background Atmosphere */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        {/* Top center stage light */}
+        <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[80%] h-[60%] bg-indigo-500/10 blur-[120px] rounded-full mix-blend-screen" />
+
+        {/* Ambient bottom glow */}
+        <div className="absolute bottom-[-10%] left-0 right-0 h-[40%] bg-gradient-to-t from-background to-transparent opacity-80" />
+
+        {/* Subtle Grain Overlay */}
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+          }}
+        />
+      </div>
 
       {/* Main content */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen pt-16 pb-8">
-        {/* Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-8"
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card border border-primary/20">
-            <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-foreground/80">
-              Premium Web Experiences
-            </span>
-          </div>
-        </motion.div>
+      <div className="relative z-10 flex flex-col items-center justify-start min-h-screen pt-28 pb-6">
 
         {/* Headline */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.1 }}
-          className="text-center mb-6 px-4"
+          animate={{ opacity: isViewerOpen ? 0 : 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
+          className="text-center mb-3 px-4 z-20 relative mt-8 pointer-events-none"
+          style={{ pointerEvents: isViewerOpen ? 'none' : 'auto' }}
         >
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-display font-bold tracking-tight">
-            <span className="text-foreground">Websites That</span>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/60 pb-2">
+            Websites That
             <br />
-            <span className="gradient-text text-glow">Feel Like Apps</span>
+            Feel Like Apps
           </h1>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 1 }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-white/5 blur-[80px] -z-10 rounded-full opacity-20"
+          />
         </motion.div>
 
-        {/* Subheadline */}
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="text-lg md:text-xl text-muted-foreground text-center max-w-2xl mb-10 px-4"
-        >
-          Premium portfolio websites for photographers, businesses, and professionals.
-          Immersive experiences that captivate and convert.
-        </motion.p>
-
-        {/* CTA Buttons */}
+        {/* Subheadline & CTA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="flex flex-col sm:flex-row gap-4 mb-16"
+          animate={{ opacity: isViewerOpen ? 0 : 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex flex-col items-center gap-4 mb-8 max-w-xl px-4 text-center"
+          style={{ pointerEvents: isViewerOpen ? 'none' : 'auto' }}
         >
-          <a href="#pricing" className="btn-hero group flex items-center gap-2">
-            View My Work
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </a>
-          <a href="#contact" className="btn-outline-glow">
-            Get Your Website
-          </a>
-        </motion.div>
-
-        {/* Section label */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="mb-4"
-        >
-          <p className="text-sm text-muted-foreground uppercase tracking-widest">
-            Selected Works
+          <p className="text-sm md:text-base text-zinc-400 font-light leading-relaxed">
+            Premium experiences for brands that demand attention.
+            <br className="hidden sm:block" />
+            Immersive, fluid, and unforgettably distinct.
           </p>
+
+          <a
+            href="#work"
+            className="group relative inline-flex items-center gap-3 px-8 py-3 bg-white text-black rounded-full font-semibold tracking-tight transition-transform duration-300 hover:scale-105 text-sm"
+          >
+            <span>View My Work</span>
+            <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+            <div className="absolute inset-0 rounded-full bg-white blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-300" />
+          </a>
         </motion.div>
 
-        {/* Portfolio Carousel */}
+        {/* Portfolio Carousel Container */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="w-full"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.2, delay: 0.4, ease: "circOut" }}
+          className="w-full relative z-10 flex-1 flex flex-col justify-end pb-4"
         >
-          <ArcCarousel />
+          <ArcCarouselNew onViewerOpenChange={setIsViewerOpen} />
         </motion.div>
 
-        {/* Bottom gradient fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
       </div>
-
-      {/* Decorative corner accents */}
-      <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-primary/5 to-transparent" />
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-secondary/5 to-transparent" />
     </section>
   );
 };

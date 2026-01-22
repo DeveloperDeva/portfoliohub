@@ -10,8 +10,10 @@ interface UseArcCarouselOptions {
 export const useArcCarousel = ({
   itemCount,
   itemWidth,
-  arcRadius,
-  friction = 0.92,
+  // Theater Mode Configuration
+  // Theater Mode Configuration
+  arcRadius = 2000, // Flatter, wider arc
+  friction = 0.95,  // Smoother momentum
 }: UseArcCarouselOptions) => {
   const [scrollX, setScrollX] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -26,10 +28,10 @@ export const useArcCarousel = ({
   const maxScroll = totalWidth / 2;
   const minScroll = -totalWidth / 2;
 
-  // Clamp scroll position
+  // No Clamp for Infinite Scroll
   const clamp = useCallback((value: number) => {
-    return Math.max(minScroll, Math.min(maxScroll, value));
-  }, [minScroll, maxScroll]);
+    return value; // Infinite!
+  }, []);
 
   // Momentum animation
   const animateMomentum = useCallback(() => {
@@ -46,11 +48,14 @@ export const useArcCarousel = ({
   }, [clamp, friction]);
 
   // Mouse handlers
+  const isDownRef = useRef(false);
+
+  // Mouse handlers
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
     }
-    setIsDragging(true);
+    isDownRef.current = true;
     dragStartXRef.current = e.clientX;
     scrollStartRef.current = scrollX;
     lastXRef.current = e.clientX;
@@ -58,20 +63,31 @@ export const useArcCarousel = ({
   }, [scrollX]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!isDragging) return;
-    
-    const deltaX = e.clientX - dragStartXRef.current;
-    const newVelocity = e.clientX - lastXRef.current;
-    velocityRef.current = newVelocity;
-    lastXRef.current = e.clientX;
-    
-    setScrollX(clamp(scrollStartRef.current + deltaX));
+    if (!isDownRef.current) return;
+
+    const currentX = e.clientX;
+    const totalDelta = Math.abs(currentX - dragStartXRef.current);
+
+    if (!isDragging && totalDelta > 15) {
+      setIsDragging(true);
+    }
+
+    if (isDragging || totalDelta > 15) {
+      const deltaX = currentX - dragStartXRef.current;
+      const newVelocity = currentX - lastXRef.current;
+      velocityRef.current = newVelocity;
+      lastXRef.current = currentX;
+
+      setScrollX(clamp(scrollStartRef.current + deltaX));
+    }
   }, [isDragging, clamp]);
 
   const handleMouseUp = useCallback(() => {
-    if (!isDragging) return;
-    setIsDragging(false);
-    animationRef.current = requestAnimationFrame(animateMomentum);
+    isDownRef.current = false;
+    if (isDragging) {
+      setIsDragging(false);
+      animationRef.current = requestAnimationFrame(animateMomentum);
+    }
   }, [isDragging, animateMomentum]);
 
   // Touch handlers
@@ -79,7 +95,7 @@ export const useArcCarousel = ({
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
     }
-    setIsDragging(true);
+    isDownRef.current = true;
     dragStartXRef.current = e.touches[0].clientX;
     scrollStartRef.current = scrollX;
     lastXRef.current = e.touches[0].clientX;
@@ -87,84 +103,145 @@ export const useArcCarousel = ({
   }, [scrollX]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!isDragging) return;
-    
-    const deltaX = e.touches[0].clientX - dragStartXRef.current;
-    const newVelocity = e.touches[0].clientX - lastXRef.current;
-    velocityRef.current = newVelocity;
-    lastXRef.current = e.touches[0].clientX;
-    
-    setScrollX(clamp(scrollStartRef.current + deltaX));
+    if (!isDownRef.current) return;
+
+    const currentX = e.touches[0].clientX;
+    const totalDelta = Math.abs(currentX - dragStartXRef.current);
+
+    if (!isDragging && totalDelta > 15) {
+      setIsDragging(true);
+    }
+
+    if (isDragging || totalDelta > 15) {
+      const deltaX = currentX - dragStartXRef.current;
+      const newVelocity = currentX - lastXRef.current;
+      velocityRef.current = newVelocity;
+      lastXRef.current = currentX;
+
+      setScrollX(clamp(scrollStartRef.current + deltaX));
+    }
   }, [isDragging, clamp]);
 
-  const handleTouchEnd = useCallback(() => {
-    if (!isDragging) return;
-    setIsDragging(false);
-    animationRef.current = requestAnimationFrame(animateMomentum);
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    isDownRef.current = false;
+    if (isDragging) {
+      setIsDragging(false);
+      animationRef.current = requestAnimationFrame(animateMomentum);
+    }
   }, [isDragging, animateMomentum]);
 
-  // Wheel handler
-  const handleWheel = useCallback((e: React.WheelEvent) => {
-    e.preventDefault();
-    if (animationRef.current) {
-      cancelAnimationFrame(animationRef.current);
-    }
-    
-    // Use deltaX for horizontal scroll, fallback to deltaY for non-trackpad
-    const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-    velocityRef.current = -delta * 0.5;
-    animationRef.current = requestAnimationFrame(animateMomentum);
-  }, [animateMomentum]);
+  const [isHovered, setIsHovered] = useState(false);
 
-  // Keyboard navigation
+  // Auto-scroll logic
+  useEffect(() => {
+    if (isDragging || isHovered) return;
+
+    let animationId: number;
+    const autoScrollSpeed = 0.5; // Pixels per frame
+
+    const animate = () => {
+      setScrollX((prev) => prev + autoScrollSpeed);
+      animationId = requestAnimationFrame(animate);
+    };
+
+    animationId = requestAnimationFrame(animate);
+
+    return () => cancelAnimationFrame(animationId);
+  }, [isDragging, isHovered]);
+
+
+  // Keyboard navigation & Click scrolling
   const scrollToIndex = useCallback((index: number) => {
-    const centerIndex = (itemCount - 1) / 2;
-    const targetScroll = (centerIndex - index) * itemWidth;
-    
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
     }
-    
+
+    const totalCircumference = itemCount * itemWidth;
+    const rawOffset = (index * itemWidth) - scrollX;
+
+    // Find shortest path to center (0)
+    let wrappedOffset = ((rawOffset % totalCircumference) + totalCircumference) % totalCircumference;
+    if (wrappedOffset > totalCircumference / 2) {
+      wrappedOffset -= totalCircumference;
+    }
+
+    // We want to force the item to the center (offset 0).
+    // Current Offset is `wrappedOffset`.
+    // So we need to ADD `wrappedOffset` to scrollX to move the "camera" to the item.
+    // Explanation: NewOffset = ItemPos - NewScrollX => 0 = ItemPos - (ScrollX + shift) 
+    // => shift = ItemPos - ScrollX = wrappedOffset.
+
+    // However, since we scroll the CAMERA, if item is at +100, we need to move camera +100.
+    const targetScroll = scrollX + wrappedOffset;
+
     // Animate to position
     const startScroll = scrollX;
     const distance = targetScroll - startScroll;
-    const duration = 300;
+    const duration = 600; // Slower, smoother move
     const startTime = performance.now();
-    
+
     const animate = (currentTime: number) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3); // Ease out cubic
-      
+      // Ease out quart
+      const eased = 1 - Math.pow(1 - progress, 4);
+
       setScrollX(startScroll + distance * eased);
-      
+
       if (progress < 1) {
         animationRef.current = requestAnimationFrame(animate);
       }
     };
-    
+
     animationRef.current = requestAnimationFrame(animate);
   }, [itemCount, itemWidth, scrollX]);
 
   // Calculate card transform based on position
   const getCardTransform = useCallback((index: number) => {
-    const centerIndex = (itemCount - 1) / 2;
-    const offset = (index - centerIndex) * itemWidth - scrollX;
-    
-    // Normalize offset for arc calculation (reduce effect for visibility)
-    const normalizedOffset = offset / (arcRadius * 2);
-    const rotateY = normalizedOffset * 35; // Max 35 degree rotation
-    const translateZ = -Math.abs(normalizedOffset) * 150; // Smaller depth
-    const scale = 1 - Math.abs(normalizedOffset) * 0.1;
-    const opacity = 1 - Math.abs(normalizedOffset) * 0.25;
-    const zIndex = Math.round(100 - Math.abs(normalizedOffset) * 10);
-    
+    const totalCircumference = itemCount * itemWidth;
+
+    // Calculate raw position relative to scroll
+    // We offset by (itemCount/2) * itemWidth to center the visual ring 0 at the front
+    const rawOffset = (index * itemWidth) - scrollX;
+
+    // Circular Wrapping Logic:
+    // 1. Modulo to range [0, total]
+    // 2. Shift to range [-total/2, total/2] so items wrap around the back
+
+    let wrappedOffset = ((rawOffset % totalCircumference) + totalCircumference) % totalCircumference;
+    if (wrappedOffset > totalCircumference / 2) {
+      wrappedOffset -= totalCircumference;
+    }
+
+    const offset = wrappedOffset;
+
+    // Normalize offset for arc calculation
+    const normalizedOffset = offset / (itemWidth * 2.5); // Spread out the effect
+
+    const absOffset = Math.abs(normalizedOffset);
+
+    // 3D Arc Logic
+    const rotateY = normalizedOffset * 25; // Gentler rotation
+    const translateZ = -Math.abs(normalizedOffset) * 200; // Deep z-push
+
+    // Cinematic Style Math
+    const scale = Math.max(0.8, 1 - absOffset * 0.1); // Subtle shrink
+    const opacity = Math.max(0, 1 - absOffset * 0.5); // Fast fade for focus
+    const blur = Math.min(10, absOffset * 6); // Blur as it moves away
+    const brightness = Math.max(0.4, 1 - absOffset * 0.4); // Dim as it moves away
+    const zIndex = Math.round(100 - absOffset * 10);
+
+    // Hide items that are too far back to prevent rendering artifacts/clutter
+    const isVisible = absOffset < 4;
+
     return {
-      transform: `translateX(${offset}px) rotateY(${rotateY}deg) translateZ(${translateZ}px) scale(${Math.max(0.75, scale)})`,
-      opacity: Math.max(0.4, opacity),
+      transform: `translateX(${offset}px) rotateY(${rotateY}deg) translateZ(${translateZ}px) scale(${scale})`,
+      opacity: isVisible ? opacity : 0,
+      filter: `blur(${blur}px) brightness(${brightness})`, // The cinematic touch
       zIndex,
+      visibility: (isVisible ? "visible" : "hidden") as "visible" | "hidden",
     };
-  }, [itemCount, itemWidth, arcRadius, scrollX]);
+  }, [itemCount, itemWidth, scrollX]);
 
   // Cleanup
   useEffect(() => {
@@ -183,11 +260,14 @@ export const useArcCarousel = ({
       onMouseDown: handleMouseDown,
       onMouseMove: handleMouseMove,
       onMouseUp: handleMouseUp,
-      onMouseLeave: handleMouseUp,
+      onMouseEnter: () => setIsHovered(true),
+      onMouseLeave: () => {
+        handleMouseUp();
+        setIsHovered(false);
+      },
       onTouchStart: handleTouchStart,
       onTouchMove: handleTouchMove,
       onTouchEnd: handleTouchEnd,
-      onWheel: handleWheel,
     },
     getCardTransform,
     scrollToIndex,

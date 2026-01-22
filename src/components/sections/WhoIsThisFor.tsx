@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Camera, Briefcase, User, ArrowRight } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 
 const audiences = [
   {
@@ -8,6 +9,7 @@ const audiences = [
     description: "Showcase your work with stunning visual galleries, seamless navigation, and fast-loading images that captivate clients.",
     benefits: ["Visual-first layouts", "Portfolio galleries", "Client inquiry forms"],
     cta: "See photographer sites",
+    categorySlug: "photographer",
   },
   {
     icon: Briefcase,
@@ -15,6 +17,7 @@ const audiences = [
     description: "Professional web presence that builds trust, converts visitors, and scales with your growth.",
     benefits: ["Conversion-focused", "Mobile-first design", "SEO-optimized"],
     cta: "View business sites",
+    categorySlug: "business",
   },
   {
     icon: User,
@@ -22,10 +25,24 @@ const audiences = [
     description: "Personal brand websites that establish authority and attract opportunities in your field.",
     benefits: ["Resume integration", "Project showcases", "Contact forms"],
     cta: "Explore personal sites",
+    categorySlug: "personal",
   },
 ];
 
 const WhoIsThisFor = () => {
+  const [_, setSearchParams] = useSearchParams();
+
+  const handleCtaClick = (categorySlug: string) => {
+    setSearchParams({ category: categorySlug });
+    const element = document.getElementById("portfolio");
+    if (element) {
+      // Small timeout to allow state update to propagate
+      setTimeout(() => {
+        element.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    }
+  };
+
   return (
     <section id="about" className="py-24 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -43,7 +60,7 @@ const WhoIsThisFor = () => {
             Crafted for Creatives & Professionals
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Whether you capture moments, build businesses, or lead teams — 
+            Whether you capture moments, build businesses, or lead teams —
             your work deserves a website that reflects your excellence.
           </p>
         </motion.div>
@@ -84,7 +101,10 @@ const WhoIsThisFor = () => {
                 </ul>
 
                 {/* CTA */}
-                <button className="flex items-center gap-2 text-primary font-medium group/btn">
+                <button
+                  onClick={() => handleCtaClick(audience.categorySlug)}
+                  className="flex items-center gap-2 text-primary font-medium group/btn"
+                >
                   {audience.cta}
                   <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                 </button>
