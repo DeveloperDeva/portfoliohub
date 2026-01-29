@@ -22,7 +22,10 @@ const AdminDashboard = () => {
       const { count, error } = await supabase
         .from('portfolio_items')
         .select('*', { count: 'exact', head: true });
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching portfolio count:', error);
+        return 0;
+      }
       return count || 0;
     },
   });
@@ -34,7 +37,10 @@ const AdminDashboard = () => {
       const { count, error } = await supabase
         .from('blog_posts')
         .select('*', { count: 'exact', head: true });
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching blog count:', error);
+        return 0;
+      }
       return count || 0;
     },
   });
@@ -48,7 +54,10 @@ const AdminDashboard = () => {
         .select('id, title, created_at, status')
         .order('created_at', { ascending: false })
         .limit(5);
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching recent portfolio:', error);
+        return [];
+      }
       return data;
     },
   });
@@ -61,7 +70,10 @@ const AdminDashboard = () => {
         .select('id, title, created_at, is_published')
         .order('created_at', { ascending: false })
         .limit(5);
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching recent blogs:', error);
+        return [];
+      }
       return data;
     },
   });

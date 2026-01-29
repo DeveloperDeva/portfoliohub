@@ -110,16 +110,18 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
           {/* User info & logout */}
           <div className="p-4 border-t border-border">
             <div className="text-sm text-muted-foreground mb-3 truncate">
-              {user?.email}
+              {user?.email || 'Admin User'}
             </div>
-            <Button
-              variant="outline"
-              className="w-full justify-start gap-2"
-              onClick={handleSignOut}
-            >
-              <LogOut className="w-4 h-4" />
-              Sign Out
-            </Button>
+            {user && (
+              <Button
+                variant="outline"
+                className="w-full justify-start gap-2"
+                onClick={handleSignOut}
+              >
+                <LogOut className="w-4 h-4" />
+                Sign Out
+              </Button>
+            )}
           </div>
         </div>
       </aside>
