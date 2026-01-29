@@ -3,25 +3,82 @@ import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, ImageOff } from "lucide-react";
 import FullScreenViewer from "./FullScreenViewer";
 import { usePortfolioItems } from "@/hooks/usePortfolioItems";
-import { fallbackPortfolioItems } from "@/data/fallbackPortfolioItems";
 
-const ArcCarouselNew = ({ onViewerOpenChange }: { onViewerOpenChange?: (isOpen: boolean) => void }) => {
+export interface PortfolioItem {
+  id: string;
+  media: string;
+  type: "image" | "video";
+  title: string;
+  category: string;
+  poster?: string;
+  description?: string;
+  website_url?: string;
+}
+
+// Fallback demo items
+const fallbackItems: PortfolioItem[] = [
+  {
+    id: "saurabh",
+    media: "/videos/portfolio-saurabh.mp4",
+    type: "video",
+    title: "Saurabh Patale",
+    category: "Photography Portfolio",
+    poster: "/videos/portfolio-saurabh.mp4",
+    website_url: "https://saurabh-patale.com",
+  },
+  {
+    id: "photographer",
+    media: "/images/portfolio/portfolio-photographer.jpg",
+    type: "image",
+    title: "Sophia Laurent",
+    category: "Photography Portfolio",
+    website_url: "https://sophialaurent.com",
+  },
+  {
+    id: "startup",
+    media: "/images/portfolio/portfolio-startup.jpg",
+    type: "image",
+    title: "Nexus AI",
+    category: "Startup Landing",
+    website_url: "https://nexusai.com",
+  },
+  {
+    id: "wedding",
+    media: "/images/portfolio/portfolio-wedding.jpg",
+    type: "image",
+    title: "Eternal Moments",
+    category: "Wedding Studio",
+    website_url: "https://eternalmoments.com",
+  },
+  {
+    id: "personal",
+    media: "/images/portfolio/portfolio-personal.jpg",
+    type: "image",
+    title: "Marcus Chen",
+    category: "Personal Brand",
+    website_url: "https://marcuschen.com",
+  },
+  {
+    id: "gym",
+    media: "/images/portfolio/portfolio-gym.jpg",
+    type: "image",
+    title: "Iron Peak Fitness",
+    category: "Gym Website",
+    website_url: "https://ironpeakfitness.com",
+  },
+  {
+    id: "agency",
+    media: "/images/portfolio/portfolio-agency.jpg",
+    type: "image",
+    title: "Stellar Creative",
+    category: "Digital Agency",
+    website_url: "https://stellarcreative.com",
+  },
+];
+
+const ArcCarouselNew = () => {
   const { data: portfolioItems, isLoading, error } = usePortfolioItems();
-  // usePortfolioItems now returns fallback items if DB is empty, but we can keep explicitly using fallbackPortfolioItems if we want to be safe or if hook behavior changes
-  // Actually the hook ALREADY returns fallback items if db is empty (as per my change in Step 132).
-  // So items will likely be populated.
-  // But let's check hook implementation.
-  // const dbItems = ...; return dbItems.length > 0 ? dbItems : fallbackPortfolioItems;
-  // So portfolioItems will be fallbackPortfolioItems if DB is empty.
-  // So I don't need to import fallbackPortfolioItems here basically?
-  // Wait, if error happens, hook throws.
-
-  // The original code was:
-  // const items = portfolioItems && portfolioItems.length > 0 ? portfolioItems : fallbackItems;
-
-  // Now simpler:
-  const items = portfolioItems || fallbackPortfolioItems;
-
+  const items = portfolioItems && portfolioItems.length > 0 ? portfolioItems : fallbackItems;
   const [centerIndex, setCenterIndex] = useState(Math.floor(items.length / 2));
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -35,11 +92,6 @@ const ArcCarouselNew = ({ onViewerOpenChange }: { onViewerOpenChange?: (isOpen: 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-  // Sync internal state with external prop
-  useEffect(() => {
-    onViewerOpenChange?.(isOpen);
-  }, [isOpen, onViewerOpenChange]);
 
   // Auto-rotate carousel
   useEffect(() => {

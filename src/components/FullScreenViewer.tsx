@@ -129,7 +129,7 @@ const FullScreenViewer = ({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-[9999] flex items-center justify-center"
+          className="fixed inset-0 z-50 flex items-center justify-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -140,7 +140,7 @@ const FullScreenViewer = ({
         >
           {/* Backdrop */}
           <motion.div
-            className="absolute inset-0 bg-[#030303] backdrop-blur-xl"
+            className="absolute inset-0 bg-background/95 backdrop-blur-xl"
             onClick={onClose}
           />
 
@@ -340,7 +340,7 @@ const FullScreenViewer = ({
 
               {/* Footer info */}
               <motion.div
-                className="p-4 border-t border-transparent flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 -mt-40"
+                className="p-4 border-t border-transparent flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 -mt-32"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
@@ -353,24 +353,9 @@ const FullScreenViewer = ({
                     {item.title}
                   </h2>
                 </div>
-                {item.website_url ? (
-                  <a
-                    href={item.website_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-outline-glow text-sm px-6 py-2 whitespace-nowrap inline-flex items-center gap-2 hover:scale-105 transition-transform"
-                  >
-                    View Live Site
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
-                ) : (
-                  <button
-                    className="btn-outline-glow text-sm px-6 py-2 whitespace-nowrap opacity-50 cursor-not-allowed"
-                    disabled
-                  >
-                    View Live Site
-                  </button>
-                )}
+                <button className="btn-outline-glow text-sm px-6 py-2 whitespace-nowrap">
+                  View Live Site
+                </button>
               </motion.div>
             </div>
           </motion.div>
@@ -385,8 +370,8 @@ const FullScreenViewer = ({
               <button
                 key={i}
                 className={`w-2 h-2 rounded-full transition-all ${i === currentIndex
-                  ? "bg-primary w-6"
-                  : "bg-muted-foreground/50 hover:bg-muted-foreground"
+                    ? "bg-primary w-6"
+                    : "bg-muted-foreground/50 hover:bg-muted-foreground"
                   }`}
                 aria-label={`Go to item ${i + 1}`}
               />

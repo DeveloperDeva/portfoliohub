@@ -1,14 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Send, MessageCircle, Mail, MapPin, ArrowRight } from "lucide-react";
+import { Send, MessageCircle, Mail, MapPin, ArrowRight, Phone, Instagram, Linkedin } from "lucide-react";
 import { toast } from "sonner";
-
-const budgetRanges = [
-  "Under $1,000",
-  "$1,000 - $2,500",
-  "$2,500 - $5,000",
-  "$5,000+",
-];
 
 const professions = [
   "Photographer",
@@ -18,34 +11,108 @@ const professions = [
   "Other",
 ];
 
+// Form validation functions
+const validateEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+const validatePhone = (phone: string): boolean => {
+  const phoneRegex = /^[0-9]{10}$/;
+  return phoneRegex.test(phone.replace(/\D/g, ""));
+};
+
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
     profession: "",
-    website: "",
-    budget: "",
     message: "",
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required";
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!validateEmail(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    if (formData.phone && !validatePhone(formData.phone)) {
+      newErrors.phone = "Phone number must be exactly 10 digits";
+    }
+
+    if (!formData.message.trim()) {
+      newErrors.message = "Message is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      toast.error("Please fix the errors in the form");
+      return;
+    }
+
     setIsSubmitting(true);
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          access_key: "c37a6b9b-f92c-4fae-9ea2-d38e55d3954a",
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone || "Not provided",
+          profession: formData.profession || "Not specified",
+          message: formData.message,
+        }),
+      });
 
-    toast.success("Message sent! I'll get back to you within 24 hours.");
-    setFormData({
-      name: "",
-      email: "",
-      profession: "",
-      website: "",
-      budget: "",
-      message: "",
-    });
-    setIsSubmitting(false);
+      const result = await response.json();
+
+      if (result.success) {
+        toast.success("Message sent! I'll get back to you within 24 hours.");
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          profession: "",
+          message: "",
+        });
+      } else {
+        toast.error("Failed to send message. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      toast.error("An error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+    setFormData({ ...formData, phone: value });
+    if (errors.phone) {
+      setErrors({ ...errors, phone: "" });
+    }
   };
 
   return (
@@ -77,38 +144,52 @@ const Contact = () => {
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">Email</div>
-                  <a href="mailto:hello@portfoliohub.com" className="text-foreground hover:text-primary transition-colors">
-                    hello@portfoliohub.com
+                  <a href="mailto:devendra01ug@gmail.com" className="text-foreground hover:text-primary transition-colors">
+                    devendra01ug@gmail.com
                   </a>
                 </div>
               </div>
 
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center">
-                  <MessageCircle className="w-5 h-5 text-primary" />
+                  <Phone className="w-5 h-5 text-primary" />
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">WhatsApp</div>
-                  <a href="https://wa.me/1234567890" className="text-foreground hover:text-primary transition-colors">
-                    +1 (234) 567-890
+                  <a href="https://wa.me/919022204258" className="text-foreground hover:text-primary transition-colors">
+                    +91 9022204258
                   </a>
                 </div>
               </div>
 
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center">
-                  <MapPin className="w-5 h-5 text-primary" />
+                  <Instagram className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <div className="text-sm text-muted-foreground">Location</div>
-                  <span className="text-foreground">Remote / Worldwide</span>
+                  <div className="text-sm text-muted-foreground">Instagram</div>
+                  <a href="https://www.instagram.com/portfolio_.hub?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" className="text-foreground hover:text-primary transition-colors">
+                    @portfolio_.hub
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center">
+                  <Linkedin className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <div className="text-sm text-muted-foreground">LinkedIn</div>
+                  <a href="https://www.linkedin.com/company/automatesmb-ai/?lipi=urn%3Ali%3Apage%3Ad_flagship3_search_srp_all%3B4U5cNu%2FnT%2BmvLQMZDZ8YRg%3D%3D" target="_blank" rel="noopener noreferrer" className="text-foreground hover:text-primary transition-colors">
+                    AutomatesSMB AI
+                  </a>
                 </div>
               </div>
             </div>
 
             {/* Quick CTA */}
             <a
-              href="https://wa.me/1234567890"
+              href="https://wa.me/919022204258"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-primary font-medium group"
@@ -136,10 +217,14 @@ const Contact = () => {
                     id="name"
                     required
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg bg-muted border border-border focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-foreground"
+                    onChange={(e) => {
+                      setFormData({ ...formData, name: e.target.value });
+                      if (errors.name) setErrors({ ...errors, name: "" });
+                    }}
+                    className={`w-full px-4 py-3 rounded-lg bg-muted border ${errors.name ? 'border-red-500' : 'border-border'} focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-foreground`}
                     placeholder="John Doe"
                   />
+                  {errors.name && <span className="text-red-500 text-sm mt-1">{errors.name}</span>}
                 </div>
 
                 <div>
@@ -151,14 +236,34 @@ const Contact = () => {
                     id="email"
                     required
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg bg-muted border border-border focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-foreground"
+                    onChange={(e) => {
+                      setFormData({ ...formData, email: e.target.value });
+                      if (errors.email) setErrors({ ...errors, email: "" });
+                    }}
+                    className={`w-full px-4 py-3 rounded-lg bg-muted border ${errors.email ? 'border-red-500' : 'border-border'} focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-foreground`}
                     placeholder="john@example.com"
                   />
+                  {errors.email && <span className="text-red-500 text-sm mt-1">{errors.email}</span>}
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-medium text-foreground mb-2">
+                    Phone (10 digits)
+                  </label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    value={formData.phone}
+                    onChange={handlePhoneChange}
+                    className={`w-full px-4 py-3 rounded-lg bg-muted border ${errors.phone ? 'border-red-500' : 'border-border'} focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-foreground`}
+                    placeholder="9022204258"
+                    maxLength="10"
+                  />
+                  {errors.phone && <span className="text-red-500 text-sm mt-1">{errors.phone}</span>}
+                </div>
+
                 <div>
                   <label htmlFor="profession" className="block text-sm font-medium text-foreground mb-2">
                     Profession
@@ -175,38 +280,9 @@ const Contact = () => {
                     ))}
                   </select>
                 </div>
-
-                <div>
-                  <label htmlFor="website" className="block text-sm font-medium text-foreground mb-2">
-                    Current Website / Instagram
-                  </label>
-                  <input
-                    type="text"
-                    id="website"
-                    value={formData.website}
-                    onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg bg-muted border border-border focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-foreground"
-                    placeholder="@yourhandle or URL"
-                  />
-                </div>
               </div>
 
-              <div className="mb-4">
-                <label htmlFor="budget" className="block text-sm font-medium text-foreground mb-2">
-                  Budget Range
-                </label>
-                <select
-                  id="budget"
-                  value={formData.budget}
-                  onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-muted border border-border focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-foreground"
-                >
-                  <option value="">Select...</option>
-                  {budgetRanges.map((b) => (
-                    <option key={b} value={b}>{b}</option>
-                  ))}
-                </select>
-              </div>
+
 
               <div className="mb-6">
                 <label htmlFor="message" className="block text-sm font-medium text-foreground mb-2">
@@ -217,10 +293,14 @@ const Contact = () => {
                   required
                   rows={4}
                   value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-muted border border-border focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-foreground resize-none"
+                  onChange={(e) => {
+                    setFormData({ ...formData, message: e.target.value });
+                    if (errors.message) setErrors({ ...errors, message: "" });
+                  }}
+                  className={`w-full px-4 py-3 rounded-lg bg-muted border ${errors.message ? 'border-red-500' : 'border-border'} focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-foreground resize-none`}
                   placeholder="What kind of website do you need? Share your vision..."
                 />
+                {errors.message && <span className="text-red-500 text-sm mt-1">{errors.message}</span>}
               </div>
 
               <button

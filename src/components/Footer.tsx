@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Mail, Instagram, Linkedin, Twitter } from "lucide-react";
+import { Mail, Instagram, Linkedin, MessageCircle, Phone } from "lucide-react";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -24,7 +24,7 @@ const Footer = () => {
             </p>
             <div className="flex items-center gap-4">
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/portfolio_.hub?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 rounded-full glass-card hover:glow-primary transition-all"
@@ -33,16 +33,7 @@ const Footer = () => {
                 <Instagram size={20} className="text-foreground" />
               </a>
               <a
-                href="https://twitter.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 rounded-full glass-card hover:glow-primary transition-all"
-                aria-label="Twitter"
-              >
-                <Twitter size={20} className="text-foreground" />
-              </a>
-              <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/company/automatesmb-ai/?lipi=urn%3Ali%3Apage%3Ad_flagship3_search_srp_all%3B4U5cNu%2FnT%2BmvLQMZDZ8YRg%3D%3D"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 rounded-full glass-card hover:glow-primary transition-all"
@@ -51,7 +42,16 @@ const Footer = () => {
                 <Linkedin size={20} className="text-foreground" />
               </a>
               <a
-                href="mailto:hello@portfoliohub.com"
+                href="https://wa.me/919022204258"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-full glass-card hover:glow-primary transition-all"
+                aria-label="WhatsApp"
+              >
+                <MessageCircle size={20} className="text-foreground" />
+              </a>
+              <a
+                href="mailto:devendra01ug@gmail.com"
                 className="p-2 rounded-full glass-card hover:glow-primary transition-all"
                 aria-label="Email"
               >
