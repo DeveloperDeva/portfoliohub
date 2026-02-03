@@ -353,9 +353,24 @@ const FullScreenViewer = ({
                     {item.title}
                   </h2>
                 </div>
-                <button className="btn-outline-glow text-sm px-6 py-2 whitespace-nowrap">
-                  View Live Site
-                </button>
+                {item.website_url ? (
+                  <a
+                    href={item.website_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-outline-glow text-sm px-6 py-2 whitespace-nowrap inline-flex items-center gap-2"
+                  >
+                    View Live Site
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                ) : (
+                  <button 
+                    className="btn-outline-glow text-sm px-6 py-2 whitespace-nowrap opacity-50 cursor-not-allowed"
+                    disabled
+                  >
+                    View Live Site
+                  </button>
+                )}
               </motion.div>
             </div>
           </motion.div>
